@@ -1,5 +1,5 @@
 export let basedatos = [
-    {id: 1, nombre: "Televisor", estado: "Dañado", ubicacion: "ambiente TIC"},
+    {id: 1, nombre: "Televisor", estado: "Dañado", ubicacion: "ambiente TIC",},
     {id: 2, nombre: "Computadora", estado: "Operativo", ubicacion: "laboratorio 1"},
     {id: 3, nombre: "Impresora", estado: "En reparación", ubicacion: "oficina 2"},
     {id: 4, nombre: "Router", estado: "Operativo", ubicacion: "sala servidores"},
