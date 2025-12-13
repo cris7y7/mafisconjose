@@ -25,3 +25,6 @@ reglas para gestionar nuestro proyecto con GIT - GIT HUB:
 
 1- paso sincronizar (start fresh)
 antes de empezar, asegurate de estar en main y tener lo ultimo
+
+
+sirve par aorganizar tu backend flask  por modulos como si fueran carpetas de funciones en lugar  de tener todo en un solo archivo se separa por temas

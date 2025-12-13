@@ -1,3 +1,4 @@
+// src/components/Usuarios.jsx
 import { useEffect, useState } from "react";
 
 export default function Usuarios() {
@@ -11,21 +12,14 @@ export default function Usuarios() {
     rol: "solicitante",
   });
 
+  // Cargar lista
   useEffect(() => {
-    const cargarUsuarios = async () => {
-      const res = await fetch("http://localhost:5000/usuarios");
-      const data = await res.json();
-      setDatos(data);
-    };
-    cargarUsuarios();
+    fetch("http://localhost:5000/api/usuarios")
+      .then((res) => res.json())
+      .then((data) => setDatos(data));
   }, []);
 
-  const cargarUsuarios = async () => {
-    const res = await fetch("http://localhost:5000/usuarios");
-    const data = await res.json();
-    setDatos(data);
-  };
-
+  // Abrir form nuevo
   const nuevo = () => {
     setForm({
       id: null,
@@ -37,82 +31,92 @@ export default function Usuarios() {
     setMostrarForm(true);
   };
 
-  const editar = (u) => {
+  // Editar
+  const editar = (item) => {
     setForm({
-      id: u.id,
-      nombre: u.nombre,
-      email: u.email,
-      password: "",
-      rol: u.rol,
+      ...item,
+      password: "", // dejar vacío para que el admin decida si la cambia
     });
     setMostrarForm(true);
   };
 
+  // Guardar (crea o actualiza)
   const guardar = async () => {
-    if (!form.nombre || !form.email || (!form.id && !form.password)) {
-      alert("Completa todos los campos");
-      return;
-    }
+    if (!form.nombre || !form.email) return alert("Completa nombre y email");
+
+    // si estamos editando y no tocamos la contraseña, no la enviamos
+    const payload = { ...form };
+    if (form.id && !form.password) delete payload.password;
 
     const url = form.id
-      ? `http://localhost:5000/usuarios/${form.id}`
-      : "http://localhost:5000/usuarios";
-
+      ? `http://localhost:5000/api/usuarios/${form.id}`
+      : "http://localhost:5000/api/usuarios";
     const method = form.id ? "PUT" : "POST";
 
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
     if (!res.ok) {
-      alert(data.error || "Error");
+      const msg = await res.json();
+      alert(msg.error || "Error al guardar");
       return;
     }
 
-    cargarUsuarios();
+    const nueva = await fetch("http://localhost:5000/api/usuarios").then((r) =>
+      r.json()
+    );
+    setDatos(nueva);
     setMostrarForm(false);
   };
 
+  // Eliminar
   const borrar = async (id) => {
-    if (!window.confirm("¿Eliminar usuario?")) return;
-
-    await fetch(`http://localhost:5000/usuarios/${id}`, {
+    if (!window.confirm("¿Confirma eliminar este usuario?")) return;
+    const res = await fetch(`http://localhost:5000/api/usuarios/${id}`, {
       method: "DELETE",
     });
-
-    cargarUsuarios();
+    if (!res.ok) {
+      const msg = await res.json();
+      alert(msg.error || "Error al borrar");
+      return;
+    }
+    const nueva = await fetch("http://localhost:5000/api/usuarios").then((r) =>
+      r.json()
+    );
+    setDatos(nueva);
   };
 
   return (
     <div className="container mt-4">
       <h2>Usuarios</h2>
-
-      <button className="btn btn-primary mb-3 bg-success" onClick={nuevo}>
+      <button className="btn btn-primary mb-3" onClick={nuevo}>
         Nuevo usuario
       </button>
 
       {mostrarForm && (
         <div className="card mb-3">
           <div className="card-body">
+            <h5>{form.id ? "Editar usuario" : "Crear usuario"}</h5>
             <input
               className="form-control mb-2"
-              placeholder="Nombre"
+              placeholder="Nombre completo"
               value={form.nombre}
               onChange={(e) => setForm({ ...form, nombre: e.target.value })}
             />
             <input
               className="form-control mb-2"
               placeholder="Email"
+              type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <input
               className="form-control mb-2"
-              type="password"
               placeholder="Contraseña"
+              type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
@@ -125,7 +129,6 @@ export default function Usuarios() {
               <option value="tecnico">Técnico</option>
               <option value="administrador">Administrador</option>
             </select>
-
             <button className="btn btn-success btn-sm me-2" onClick={guardar}>
               Guardar
             </button>
@@ -146,28 +149,28 @@ export default function Usuarios() {
             <th>Nombre</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Fecha</th>
-            <th></th>
+            <th>Fecha registro</th>
+            <th className="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {datos.map((u) => (
-            <tr key={u.id}>
-              <td>{u.id}</td>
-              <td>{u.nombre}</td>
-              <td>{u.email}</td>
-              <td>{u.rol}</td>
-              <td>{new Date(u.fecha_registro).toLocaleString()}</td>
-              <td>
+          {datos.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.nombre}</td>
+              <td>{item.email}</td>
+              <td>{item.rol}</td>
+              <td>{new Date(item.fecha_registro).toLocaleString()}</td>
+              <td className="text-center">
                 <button
-                  className="btn btn-sm btn-warning me-2"
-                  onClick={() => editar(u)}
+                  className="btn btn-sm btn-outline-warning me-2"
+                  onClick={() => editar(item)}
                 >
                   Editar
                 </button>
                 <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => borrar(u.id)}
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => borrar(item.id)}
                 >
                   Borrar
                 </button>

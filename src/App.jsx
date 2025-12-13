@@ -1,24 +1,29 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Activos from "./componentes/Activos";
-import Reportes from "./componentes/Reportes";
-import Usuarios from "./componentes/Usuarios";
-import Navbar from "./componentes/Navbar";
+import { useState, useEffect } from "react";
+import Login from "./componentes/Login";
+import Dashboard from "./componentes/Dashboard";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
+export default function App() {
+  const [user, setUser] = useState(null);
 
-      <div className="container mt-4">
-        <Routes>
-          <Route path="/" element={<Activos />} />
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/usuarios" element={<Usuarios />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
-  );
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const raw = localStorage.getItem("user");
+    if (token && raw) {
+      try {
+        setUser(JSON.parse(raw));
+      } catch {
+        localStorage.clear();
+      }
+    }
+  }, []);
+
+  const handleLogin = (u) => setUser(u);
+  const handleLogout = () => {
+    localStorage.clear();
+    setUser(null);
+  };
+
+  if (!user) return <Login onLogin={handleLogin} />;
+
+  return <Dashboard user={user} onLogout={handleLogout} />;
 }
-
-export default App;
- 
