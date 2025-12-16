@@ -1,0 +1,130 @@
+/* =========================
+   CONTENEDOR GENERAL
+========================= */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #5fbfc9, #4caf50, #2e7d32);
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #ffffff, #f4f6f9);
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+}
+
+.sidebar-title {
+  text-align: center;
+  color: #1b5e20;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 35px;
+}
+
+.sidebar button {
+  background: #ffffff;
+  border: 1px solid #1b5e20;
+  color: #1b5e20;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.sidebar button:hover {
+  background: #1b5e20;
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.sidebar button.active {
+  background: #1b5e20;
+  color: #ffffff;
+  box-shadow: 0 6px 15px rgba(27, 94, 32, 0.35);
+}
+
+/* FOOTER */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.sidebar .logout {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.sidebar .logout:hover {
+  background: #c62828;
+  color: #ffffff;
+}
+
+/* =========================
+   AREA PRINCIPAL
+========================= */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* BIENVENIDA */
+.welcome-box {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-box strong {
+  color: #1b5e20;
+}
+
+/* =========================
+   TARJETA CENTRAL
+========================= */
+.card-content {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================
+   TABLAS (ACTIVOS, ETC)
+========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f4f6f9;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tr:hover {
+  background: #f9f9f9;
+}

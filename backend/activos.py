@@ -4,9 +4,9 @@ import pymysql
 bp = Blueprint('activos', __name__, url_prefix='/api')
 
 def get_connection():
-    return pymysql.connect(host='127.0.0.2', user='root', password='1234', database='activoss', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.2', user='root', password='1234', database='activos', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
 
-@bp.route('/activoss')
+@bp.route('/activos')
 def get_activos():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -15,7 +15,7 @@ def get_activos():
     conn.close()
     return jsonify(rows)
 
-@bp.route('/activoss', methods=['POST'])
+@bp.route('/activos', methods=['POST'])
 def crear_activo():
     data = request.get_json()
     conn = get_connection()

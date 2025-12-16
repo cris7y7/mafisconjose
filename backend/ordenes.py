@@ -6,7 +6,7 @@ bp = Blueprint('ordenes', __name__, url_prefix='/api')
 def get_connection():
     return pymysql.connect(
         host='127.0.0.2',
-        user='root', password='1234', database='activoss',
+        user='root', password='1234', database='activos',
         charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor
     )
 
