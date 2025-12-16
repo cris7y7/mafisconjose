@@ -19,7 +19,7 @@ export default function Reportes() {
       .then((res) => res.json())
       .then((data) => setDatos(data));
     // activos (para select)
-    fetch("http://localhost:5000/api/activoss")
+    fetch("http://localhost:5000/api/reportes")
       .then((res) => res.json())
       .then((data) => setActivos(data));
   }, []);

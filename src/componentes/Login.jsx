@@ -1,4 +1,6 @@
 import { useState } from "react";
+import "./Login.css";
+import logo from "../assets/mafis.jpeg"; // ajusta si usas otra ruta
 
 export default function Login({ onLogin }) {
   const [vista, setVista] = useState("login");
@@ -59,129 +61,92 @@ export default function Login({ onLogin }) {
     setVista("login");
   };
 
-  // Vista actual
-  if (vista === "login")
-    return (
-      <div className="container mt-5" style={{ maxWidth: 400 }}>
-        <h2 className="mb-4 text-center">Iniciar sesión</h2>
-        <form onSubmit={login} className="card p-4">
-          <input
-            type="email"
-            className="form-control mb-2"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            className="form-control mb-3"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit" className="btn btn-primary w-100 mb-2">
-            Entrar
-          </button>
-          <div className="text-center">
-            <button
-              type="button"
-              className="btn btn-link btn-sm"
-              onClick={() => setVista("register")}
-            >
-              Crear cuenta
-            </button>
-            <button
-              type="button"
-              className="btn btn-link btn-sm"
-              onClick={() => setVista("recover")}
-            >
-              Olvidé mi contraseña
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-
-  if (vista === "register")
-    return (
-      <div className="container mt-5" style={{ maxWidth: 400 }}>
-        <h2 className="mb-4 text-center">Crear cuenta</h2>
-        <form onSubmit={register} className="card p-4">
-          <input
-            className="form-control mb-2"
-            placeholder="Nombre completo"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            className="form-control mb-2"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            className="form-control mb-2"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <select
-            className="form-select mb-3"
-            value={rol}
-            onChange={(e) => setRol(e.target.value)}
-          >
-            <option value="solicitante">Solicitante</option>
-            <option value="tecnico">Técnico</option>
-            <option value="administrador">Administrador</option>
-          </select>
-          <button type="submit" className="btn btn-success w-100 mb-2">
-            Crear cuenta
-          </button>
-          <div className="text-center">
-            <button
-              type="button"
-              className="btn btn-link btn-sm"
-              onClick={() => setVista("login")}
-            >
-              Ya tengo cuenta
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-
   return (
-    <div className="container mt-5" style={{ maxWidth: 400 }}>
-      <h2 className="mb-4 text-center">Recuperar contraseña</h2>
-      <form onSubmit={recover} className="card p-4">
-        <input
-          type="email"
-          className="form-control mb-3"
-          placeholder="Email de tu cuenta"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit" className="btn btn-warning w-100 mb-2">
-          Enviar enlace
-        </button>
-        <div className="text-center">
-          <button
-            type="button"
-            className="btn btn-link btn-sm"
-            onClick={() => setVista("login")}
-          >
-            Volver al login
-          </button>
+    <div className="login-bg">
+      <div className="login-card">
+        <div className="login-header">
+          <img src={logo} alt="MAFIS" />
+          <h2>MAFIS</h2>
         </div>
-      </form>
+
+        {vista === "login" && (
+          <form onSubmit={login}>
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button type="submit">Iniciar sesión</button>
+
+            <div className="login-links">
+              <span onClick={() => setVista("register")}>Crear cuenta</span>
+              <span onClick={() => setVista("recover")}>
+                Olvidé mi contraseña
+              </span>
+            </div>
+          </form>
+        )}
+
+        {vista === "register" && (
+          <form onSubmit={register}>
+            <input
+              placeholder="Nombre completo"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <select value={rol} onChange={(e) => setRol(e.target.value)}>
+              <option value="solicitante">Solicitante</option>
+              <option value="tecnico">Técnico</option>
+              <option value="administrador">Administrador</option>
+            </select>
+
+            <button type="submit">Crear cuenta</button>
+            <div className="login-links">
+              <span onClick={() => setVista("login")}>Ya tengo cuenta</span>
+            </div>
+          </form>
+        )}
+
+        {vista === "recover" && (
+          <form onSubmit={recover}>
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button type="submit">Recuperar contraseña</button>
+            <div className="login-links">
+              <span onClick={() => setVista("login")}>Volver al login</span>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

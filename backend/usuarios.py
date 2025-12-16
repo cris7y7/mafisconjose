@@ -10,7 +10,7 @@ def get_connection():
         host='127.0.0.2',
         user='root',
         password='1234',
-        database='activoss',
+        database='activos',
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor
     )

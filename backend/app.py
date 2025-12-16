@@ -1,8 +1,11 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
+# CORS: permitir frontend en Netlify (y localhost para pruebas)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # ---------- REGISTRO DE BLUEPRINTS ----------
 from auth import bp as auth_bp
@@ -17,11 +20,7 @@ app.register_blueprint(reportes_bp, url_prefix='/api')
 app.register_blueprint(usuarios_bp, url_prefix='/api')
 app.register_blueprint(ordenes_bp, url_prefix='/api')
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
-    
-    
-    
-    
-    
+# ---------- ARRANQUE PARA RENDER ----------
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

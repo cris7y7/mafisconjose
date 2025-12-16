@@ -11,7 +11,7 @@ export default function Activos() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/activoss")
+    fetch("http://localhost:5000/api/activos")
       .then((res) => res.json())
       .then((data) => setDatos(data));
   }, []);
@@ -30,8 +30,8 @@ export default function Activos() {
     if (!form.nombreActivo || !form.ubicacion)
       return alert("Completa los campos");
     const url = form.id
-      ? `http://localhost:5000/api/activoss/${form.id}`
-      : "http://localhost:5000/api/activoss";
+      ? `http://localhost:5000/api/activos/${form.id}`
+      : "http://localhost:5000/api/activos";
     const method = form.id ? "PUT" : "POST";
     const res = await fetch(url, {
       method,
@@ -39,7 +39,7 @@ export default function Activos() {
       body: JSON.stringify(form),
     });
     if (!res.ok) return alert("Error al guardar");
-    const nueva = await fetch("http://localhost:5000/api/activoss").then((r) =>
+    const nueva = await fetch("http://localhost:5000/api/activos").then((r) =>
       r.json()
     );
     setDatos(nueva);
@@ -48,11 +48,11 @@ export default function Activos() {
 
   const borrar = async (id) => {
     if (!window.confirm("¿Confirma eliminar este activo?")) return;
-    const res = await fetch(`http://localhost:5000/api/activoss/${id}`, {
+    const res = await fetch(`http://localhost:5000/api/activos/${id}`, {
       method: "DELETE",
     });
     if (!res.ok) return alert("Error al borrar");
-    const nueva = await fetch("http://localhost:5000/api/activoss").then((r) =>
+    const nueva = await fetch("http://localhost:5000/api/activos").then((r) =>
       r.json()
     );
     setDatos(nueva);
