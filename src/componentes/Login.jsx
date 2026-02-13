@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./Login.css";
-import logo from "../assets/mafis.jpeg"; // ajusta si usas otra ruta
+import logo from "../assets/mafis.jpeg";
+import { API_BASE } from "../api";
 
 export default function Login({ onLogin }) {
   const [vista, setVista] = useState("login");
@@ -9,10 +10,9 @@ export default function Login({ onLogin }) {
   const [nombre, setNombre] = useState("");
   const [rol, setRol] = useState("solicitante");
 
-  // ---------- LOGIN ----------
   const login = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/login", {
+    const res = await fetch(`${API_BASE}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -27,10 +27,9 @@ export default function Login({ onLogin }) {
     onLogin(user);
   };
 
-  // ---------- REGISTRO ----------
   const register = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/register", {
+    const res = await fetch(`${API_BASE}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nombre, email, password, rol }),
@@ -44,10 +43,9 @@ export default function Login({ onLogin }) {
     setVista("login");
   };
 
-  // ---------- RECUPERAR ----------
   const recover = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/recover", {
+    const res = await fetch(`${API_BASE}/recover`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -71,53 +69,22 @@ export default function Login({ onLogin }) {
 
         {vista === "login" && (
           <form onSubmit={login}>
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <button type="submit">Iniciar sesión</button>
 
             <div className="login-links">
               <span onClick={() => setVista("register")}>Crear cuenta</span>
-              <span onClick={() => setVista("recover")}>
-                Olvidé mi contraseña
-              </span>
+              <span onClick={() => setVista("recover")}>Olvidé mi contraseña</span>
             </div>
           </form>
         )}
 
         {vista === "register" && (
           <form onSubmit={register}>
-            <input
-              placeholder="Nombre completo"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
-            />
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input placeholder="Nombre completo" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+            <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <select value={rol} onChange={(e) => setRol(e.target.value)}>
               <option value="solicitante">Solicitante</option>
               <option value="tecnico">Técnico</option>
@@ -133,13 +100,7 @@ export default function Login({ onLogin }) {
 
         {vista === "recover" && (
           <form onSubmit={recover}>
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <button type="submit">Recuperar contraseña</button>
             <div className="login-links">
               <span onClick={() => setVista("login")}>Volver al login</span>

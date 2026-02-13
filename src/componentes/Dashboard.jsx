@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Activos from "./Activos";
-import Reportes from "./reportes";
+import Reportes from "./Reportes";
 import Usuarios from "./Usuarios";
 import Ordenes from "./Ordenes";
-import "./dashboard.css";
+import "./Dashboard.css";
 
 /* SIDEBAR */
 const Sidebar = ({ seccion, setSeccion, user, onLogout }) => (

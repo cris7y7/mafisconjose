@@ -1,14 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { apiFetch } from "../api";
 
 function useActivos() {
-const [datos, setDatos] = useState([]);
+  const [datos, setDatos] = useState([]);
 
-
-useEffect(()=> {
-    fetch("http://127.0.0.1:5000/activoss")
+  useEffect(() => {
+    apiFetch("/activos")
       .then((res) => res.json())
       .then((data) => setDatos(data));
-}, []);
+  }, []);
+
+  return datos;
 }
 
-export default useActivos
+export default useActivos;

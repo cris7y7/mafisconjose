@@ -1,5 +1,6 @@
 // src/components/Usuarios.jsx
 import { useEffect, useState } from "react";
+import { apiFetch } from "../api";
 
 export default function Usuarios() {
   const [datos, setDatos] = useState([]);
@@ -14,7 +15,7 @@ export default function Usuarios() {
 
   // Cargar lista
   useEffect(() => {
-    fetch("http://localhost:5000/api/usuarios")
+    apiFetch("/usuarios")
       .then((res) => res.json())
       .then((data) => setDatos(data));
   }, []);
@@ -49,11 +50,11 @@ export default function Usuarios() {
     if (form.id && !form.password) delete payload.password;
 
     const url = form.id
-      ? `http://localhost:5000/api/usuarios/${form.id}`
-      : "http://localhost:5000/api/usuarios";
+      ? `/usuarios/${form.id}`
+      : "/usuarios";
     const method = form.id ? "PUT" : "POST";
 
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -65,7 +66,7 @@ export default function Usuarios() {
       return;
     }
 
-    const nueva = await fetch("http://localhost:5000/api/usuarios").then((r) =>
+    const nueva = await apiFetch("/usuarios").then((r) =>
       r.json()
     );
     setDatos(nueva);
@@ -75,7 +76,7 @@ export default function Usuarios() {
   // Eliminar
   const borrar = async (id) => {
     if (!window.confirm("¿Confirma eliminar este usuario?")) return;
-    const res = await fetch(`http://localhost:5000/api/usuarios/${id}`, {
+    const res = await apiFetch(`/usuarios/${id}`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -83,7 +84,7 @@ export default function Usuarios() {
       alert(msg.error || "Error al borrar");
       return;
     }
-    const nueva = await fetch("http://localhost:5000/api/usuarios").then((r) =>
+    const nueva = await apiFetch("/usuarios").then((r) =>
       r.json()
     );
     setDatos(nueva);
