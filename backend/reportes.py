@@ -1,13 +1,13 @@
 from flask import Blueprint, jsonify, request
-import pymysql
+
+from config import get_connection
+from auth import token_required
 
 bp = Blueprint('reportes', __name__, url_prefix='/api')
 
-def get_connection():
-    return pymysql.connect(host='127.0.0.2', user='root', password='1234', database='activos', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
 
-# 1. Listar con JOIN a activo y cuenta de órdenes
 @bp.route('/reportes')
+@token_required
 def get_reportes():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -23,8 +23,9 @@ def get_reportes():
     conn.close()
     return jsonify(rows)
 
-# ---------- REPORTES SIN ORDEN (para select) ----------
+
 @bp.route('/reportes/sin-orden')
+@token_required
 def get_reportes_sin_orden():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -40,10 +41,14 @@ def get_reportes_sin_orden():
     conn.close()
     return jsonify(rows)
 
-# 2. Crear reporte
+
 @bp.route('/reportes', methods=['POST'])
+@token_required
 def crear_reporte():
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not data.get('activo_id') or not data.get('descripcion') or not data.get('prioridad'):
+        return jsonify({'error': 'Faltan campos'}), 400
+
     conn = get_connection()
     with conn.cursor() as cursor:
         sql = "INSERT INTO reportes_falla (activo_id, descripcion, prioridad, estado) VALUES (%s, %s, %s, %s)"
@@ -52,10 +57,14 @@ def crear_reporte():
     conn.close()
     return jsonify({'msg': 'Reporte creado'}), 201
 
-# 3. Editar reporte
+
 @bp.route('/reportes/<int:id>', methods=['PUT'])
+@token_required
 def actualizar_reporte(id):
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not data.get('activo_id') or not data.get('descripcion') or not data.get('prioridad') or not data.get('estado'):
+        return jsonify({'error': 'Faltan campos'}), 400
+
     conn = get_connection()
     with conn.cursor() as cursor:
         sql = "UPDATE reportes_falla SET activo_id=%s, descripcion=%s, prioridad=%s, estado=%s WHERE id=%s"
@@ -66,8 +75,9 @@ def actualizar_reporte(id):
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Actualizado'})
 
-# 4. Eliminar reporte (solo si no tiene órdenes)
+
 @bp.route('/reportes/<int:id>', methods=['DELETE'])
+@token_required
 def borrar_reporte(id):
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -83,6 +93,7 @@ def borrar_reporte(id):
     if filas == 0:
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Borrado'})
+
 
 @bp.route('/reportes/<int:id>', methods=['OPTIONS'])
 def options_reporte(id):

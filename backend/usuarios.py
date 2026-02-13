@@ -1,26 +1,20 @@
-# backend/routes/usuarios.py
 from flask import Blueprint, jsonify, request
-import pymysql
 import hashlib
+
+from config import get_connection
+from auth import token_required, roles_required
 
 bp = Blueprint('usuarios', __name__, url_prefix='/api')
 
-def get_connection():
-    return pymysql.connect(
-        host='127.0.0.2',
-        user='root',
-        password='1234',
-        database='activos',
-        charset='utf8mb4',
-        cursorclass=pymysql.cursors.DictCursor
-    )
 
 def hash_password(password: str) -> str:
     salt = "mafis-salt"
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
-# 1. Listar (sin passwords)
+
 @bp.route('/usuarios')
+@token_required
+@roles_required('administrador')
 def get_usuarios():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -32,10 +26,15 @@ def get_usuarios():
     conn.close()
     return jsonify(rows)
 
-# 2. Crear usuario
+
 @bp.route('/usuarios', methods=['POST'])
+@token_required
+@roles_required('administrador')
 def crear_usuario():
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not data.get('nombre') or not data.get('email') or not data.get('password'):
+        return jsonify({'error': 'Faltan campos'}), 400
+
     conn = get_connection()
     with conn.cursor() as cursor:
         cursor.execute("SELECT id FROM usuarios WHERE email=%s", (data['email'],))
@@ -56,17 +55,20 @@ def crear_usuario():
     conn.close()
     return jsonify({'msg': 'Usuario creado'}), 201
 
-# 3. Editar usuario (password opcional)
+
 @bp.route('/usuarios/<int:id>', methods=['PUT'])
+@token_required
+@roles_required('administrador')
 def actualizar_usuario(id):
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not data.get('nombre') or not data.get('email') or not data.get('rol'):
+        return jsonify({'error': 'Faltan campos'}), 400
+
     conn = get_connection()
     with conn.cursor() as cursor:
-        # campos básicos
         sql_base = "UPDATE usuarios SET nombre=%s, email=%s, rol=%s"
         params = [data['nombre'], data['email'], data['rol']]
 
-        # ¿llegó nueva contraseña?
         if data.get('password'):
             params.append(hash_password(data['password']))
             sql_base += ", password_hash=%s"
@@ -81,8 +83,10 @@ def actualizar_usuario(id):
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Actualizado'})
 
-# 4. Eliminar usuario (solo si no tiene órdenes)
+
 @bp.route('/usuarios/<int:id>', methods=['DELETE'])
+@token_required
+@roles_required('administrador')
 def borrar_usuario(id):
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -93,9 +97,7 @@ def borrar_usuario(id):
         count = cursor.fetchone()['total']
         if count > 0:
             conn.close()
-            return jsonify(
-                {'error': 'No se puede eliminar: tiene órdenes asociadas'}
-            ), 409
+            return jsonify({'error': 'No se puede eliminar: tiene órdenes asociadas'}), 409
 
         filas = cursor.execute("DELETE FROM usuarios WHERE id=%s", (id,))
         conn.commit()
@@ -104,7 +106,7 @@ def borrar_usuario(id):
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Borrado'})
 
-# 5. CORS pre-flight
+
 @bp.route('/usuarios/<int:id>', methods=['OPTIONS'])
 def options_usuario(id):
     return '', 200

@@ -1,17 +1,13 @@
 from flask import Blueprint, jsonify, request
-import pymysql
+
+from config import get_connection
+from auth import token_required, roles_required
 
 bp = Blueprint('ordenes', __name__, url_prefix='/api')
 
-def get_connection():
-    return pymysql.connect(
-        host='127.0.0.2',
-        user='root', password='1234', database='activos',
-        charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor
-    )
 
-# 1. Listar órdenes con JOIN y sin reportes ya asignados
 @bp.route('/ordenes')
+@token_required
 def get_ordenes():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -29,8 +25,9 @@ def get_ordenes():
     conn.close()
     return jsonify(rows)
 
-# 2. Órdenes SIN asignar (para select)
+
 @bp.route('/ordenes/sin-asignar')
+@token_required
 def get_ordenes_sin_asignar():
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -46,10 +43,15 @@ def get_ordenes_sin_asignar():
     conn.close()
     return jsonify(rows)
 
-# 3. Crear orden (asigna reporte a técnico)
+
 @bp.route('/ordenes', methods=['POST'])
+@token_required
+@roles_required('administrador', 'tecnico')
 def crear_orden():
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not data.get('reporte_id') or not data.get('usuario_id') or not data.get('descripcion'):
+        return jsonify({'error': 'Faltan campos'}), 400
+
     conn = get_connection()
     with conn.cursor() as cursor:
         sql = "INSERT INTO ordenes_trabajo (reporte_id, usuario_id, descripcion, estado) VALUES (%s, %s, %s, %s)"
@@ -58,10 +60,12 @@ def crear_orden():
     conn.close()
     return jsonify({'msg': 'Orden creada'}), 201
 
-# 4. Cambiar estado (botón "Iniciar" o "Completar")
+
 @bp.route('/ordenes/<int:id>/estado', methods=['PUT'])
+@token_required
+@roles_required('administrador', 'tecnico')
 def cambiar_estado_orden(id):
-    data = request.get_json()
+    data = request.get_json() or {}
     nuevo_estado = data.get('estado')
     if nuevo_estado not in ['Asignada', 'En proceso', 'Completada']:
         return jsonify({'error': 'Estado inválido'}), 400
@@ -76,8 +80,10 @@ def cambiar_estado_orden(id):
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Estado actualizado'})
 
-# 5. Eliminar orden
+
 @bp.route('/ordenes/<int:id>', methods=['DELETE'])
+@token_required
+@roles_required('administrador')
 def borrar_orden(id):
     conn = get_connection()
     with conn.cursor() as cursor:
@@ -87,6 +93,7 @@ def borrar_orden(id):
     if filas == 0:
         return jsonify({'error': 'Not found'}), 404
     return jsonify({'msg': 'Borrado'})
+
 
 @bp.route('/ordenes/<int:id>', methods=['OPTIONS'])
 def options_orden(id):
